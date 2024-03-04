@@ -1,14 +1,46 @@
 provider "aws" {
-    region = "ap-southeast-2"
+  region = var.aws_region
 }
 
-module "ec2_instance" {
+# Create VPC
+resource "aws_vpc" "my_vpc" {
+  cidr_block = "10.0.0.0/16"
+}
 
-  source             = "github.com/Harshahd97/modules_practice"
-  aws_region         = "ap-southeast-2"
-  instance_type      = "t2.micro"
-  instance_name      = "instance_from_local"
-  ami                = "ami-0d6f74b9139d26bf1"
-  vpc_id             = "vpc-0c230a9e1f25e9dae"
-  security_group_ids = ["sg-0fa334d268260606d"]
+# Create security group
+resource "aws_security_group" "my_security_group" {
+  name        = "my-security-group"
+  description = "Allow SSH and HTTP traffic"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Create EC2 instance
+resource "aws_instance" "my_instance" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  vpc_security_group_ids = var.security_group_ids
+  tags = {
+    Name = var.instance_name
+  }
 }
