@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout your source code from version control
-                git 'https://github.com/your/repo.git'
+                git 'https://github.com/Harshahd97/modules_practice.git'
             }
         }
         stage('Terraform Init') {
